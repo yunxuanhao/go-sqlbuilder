@@ -40,9 +40,7 @@ func TestCond(t *testing.T) {
 		"$$a < ALL ($0)":              func() string { return newTestCond().All("$a", "<", 1) },
 		"$$a > SOME ($0, $1, $2)":     func() string { return newTestCond().Some("$a", ">", 1, 2, 3) },
 		"$0":                          func() string { return newTestCond().Var(123) },
-		"(country, location) IN (($0, $1), ($2, $3))": func() string {
-			return newTestCond().MultiIn([]string{"country", "location"}, []interface{}{"cn", "bj"}, []interface{}{"us", "los angeles"})
-		},
+		"($$a, $$b) IN (($0, $1))":    func() string { return newTestCond().MultiIn([]string{"$a", "$b"}, []interface{}{"x", 0}) },
 	}
 
 	for expected, f := range cases {

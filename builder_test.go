@@ -6,7 +6,7 @@ package sqlbuilder
 import (
 	"database/sql"
 	"fmt"
-	"github.com/stretchr/testify/assert"
+	"github.com/huandu/go-assert"
 	"testing"
 )
 

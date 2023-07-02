@@ -112,6 +112,33 @@ func (c *Cond) In(field string, value ...interface{}) string {
 	return buf.String()
 }
 
+// In represents "multi field IN (value...)".
+func (c *Cond) MultiIn(fields []string, values ...[]interface{}) string {
+	vs := make([]string, 0, len(values))
+
+	for _, value := range values {
+		vl := make([]string, 0, len(value))
+		for _, v := range value {
+			vl = append(vl, c.Args.Add(v))
+		}
+		vs = append(vs, "("+strings.Join(vl, ", ")+")")
+	}
+	var fs = make([]string, 0, len(fields))
+	for _, field := range fields {
+		fs = append(fs, Escape(field))
+	}
+
+	buf := &strings.Builder{}
+	buf.WriteString("(")
+	buf.WriteString(strings.Join(fs, ", "))
+	buf.WriteString(")")
+
+	buf.WriteString(" IN (")
+	buf.WriteString(strings.Join(vs, ", "))
+	buf.WriteString(")")
+	return buf.String()
+}
+
 // NotIn represents "field NOT IN (value...)".
 func (c *Cond) NotIn(field string, value ...interface{}) string {
 	vs := make([]string, 0, len(value))

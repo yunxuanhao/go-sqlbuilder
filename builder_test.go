@@ -6,9 +6,8 @@ package sqlbuilder
 import (
 	"database/sql"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
-
-	"github.com/huandu/go-assert"
 )
 
 func ExampleBuildf() {
@@ -32,6 +31,22 @@ func ExampleBuild() {
 	b := Build("EXPLAIN $? LEFT JOIN SELECT * FROM $? WHERE created_at > $? AND state IN (${states}) AND modified_at BETWEEN $2 AND $?",
 		sb, Raw("banned"), 1514458225, 1514544625, Named("states", List([]int{3, 4, 5})))
 	s, args := b.Build()
+
+	fmt.Println(s)
+	fmt.Println(args)
+
+	// Output:
+	// EXPLAIN SELECT id FROM user WHERE status IN (?, ?) LEFT JOIN SELECT * FROM banned WHERE created_at > ? AND state IN (?, ?, ?) AND modified_at BETWEEN ? AND ?
+	// [1 2 1514458225 3 4 5 1514458225 1514544625]
+}
+
+func ExampleBuildx() {
+	sb := NewSelectBuilder()
+	sb.Select("id").From("user").Where(sb.MultiIn([]string{"status", "user"}, []interface{}{1, 2}, []interface{}{4, 5}))
+
+	// b := Build("EXPLAIN $? LEFT JOIN SELECT * FROM $? WHERE created_at > $? AND state IN (${states}) AND modified_at BETWEEN $2 AND $?",
+	// 	sb, Raw("banned"), 1514458225, 1514544625, Named("states", List([]int{3, 4, 5})))
+	s, args := sb.Build()
 
 	fmt.Println(s)
 	fmt.Println(args)

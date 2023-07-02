@@ -40,22 +40,6 @@ func ExampleBuild() {
 	// [1 2 1514458225 3 4 5 1514458225 1514544625]
 }
 
-func ExampleBuildx() {
-	sb := NewSelectBuilder()
-	sb.Select("id").From("user").Where(sb.MultiIn([]string{"status", "user"}, []interface{}{1, 2}, []interface{}{4, 5}))
-
-	// b := Build("EXPLAIN $? LEFT JOIN SELECT * FROM $? WHERE created_at > $? AND state IN (${states}) AND modified_at BETWEEN $2 AND $?",
-	// 	sb, Raw("banned"), 1514458225, 1514544625, Named("states", List([]int{3, 4, 5})))
-	s, args := sb.Build()
-
-	fmt.Println(s)
-	fmt.Println(args)
-
-	// Output:
-	// EXPLAIN SELECT id FROM user WHERE status IN (?, ?) LEFT JOIN SELECT * FROM banned WHERE created_at > ? AND state IN (?, ?, ?) AND modified_at BETWEEN ? AND ?
-	// [1 2 1514458225 3 4 5 1514458225 1514544625]
-}
-
 func ExampleBuildNamed() {
 	b := BuildNamed("SELECT * FROM ${table} WHERE status IN (${status}) AND name LIKE ${name} AND created_at > ${time} AND modified_at < ${time} + 86400",
 		map[string]interface{}{

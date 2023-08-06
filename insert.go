@@ -101,7 +101,6 @@ func (ib *InsertBuilder) InsertItem(item interface{}) *InsertBuilder {
 	for i := 0; i < valueType.NumField(); i++ {
 		dbKey := valueType.Field(i).Tag.Get("key")
 		if dbKey == "primary" {
-			// dbList := strings.Split(dbTag, ";")
 			continue
 		}
 

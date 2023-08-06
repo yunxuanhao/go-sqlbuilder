@@ -104,6 +104,11 @@ func (ib *InsertBuilder) InsertItem(item interface{}) *InsertBuilder {
 			continue
 		}
 
+		col := valueType.Field(i).Tag.Get("db")
+		if col == "ignore" {
+			continue
+		}
+
 		cols = append(cols, valueType.Field(i).Tag.Get("db"))
 		values = append(values, valueData.Field(i).Interface())
 	}

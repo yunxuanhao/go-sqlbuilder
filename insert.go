@@ -99,16 +99,14 @@ func (ib *InsertBuilder) InsertItem(item interface{}) *InsertBuilder {
 
 	// 构建插入语句
 	for i := 0; i < valueType.NumField(); i++ {
-		dbTag := valueType.Field(i).Tag.Get("db")
-		dbList := strings.Split(dbTag, ";")
-		// if primary_key in dbTag, skip
-		if len(dbList) > 1 && dbList[1] == "primary_key" {
+		dbKey := valueType.Field(i).Tag.Get("key")
+		if dbKey == "primary" {
+			// dbList := strings.Split(dbTag, ";")
 			continue
 		}
-		if len(dbList) > 0 {
-			cols = append(cols, dbList[0])
-			values = append(values, valueData.Field(i).Interface())
-		}
+
+		cols = append(cols, valueType.Field(i).Tag.Get("db"))
+		values = append(values, valueData.Field(i).Interface())
 	}
 	ib.Cols(cols...).Values(values...)
 	return ib

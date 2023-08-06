@@ -5,6 +5,7 @@ package sqlbuilder
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -79,6 +80,37 @@ func (ib *InsertBuilder) ReplaceInto(table string) *InsertBuilder {
 	ib.verb = "REPLACE"
 	ib.table = Escape(table)
 	ib.marker = insertMarkerAfterInsertInto
+	return ib
+}
+
+func (ib *InsertBuilder) InsertItem(item interface{}) *InsertBuilder {
+	var cols []string
+	var values []interface{}
+
+	valueType := reflect.TypeOf(item)
+	valueData := reflect.ValueOf(item)
+
+	// 检查是否是指针类型
+	if valueType.Kind() == reflect.Ptr {
+		// 获取指针所指向的实际类型
+		valueType = valueType.Elem()
+		valueData = valueData.Elem()
+	}
+
+	// 构建插入语句
+	for i := 0; i < valueType.NumField(); i++ {
+		dbTag := valueType.Field(i).Tag.Get("db")
+		dbList := strings.Split(dbTag, ";")
+		// if primary_key in dbTag, skip
+		if len(dbList) > 1 && dbList[1] == "primary_key" {
+			continue
+		}
+		if len(dbList) > 0 {
+			cols = append(cols, dbList[0])
+			values = append(values, valueData.Field(i).Interface())
+		}
+	}
+	ib.Cols(cols...).Values(values...)
 	return ib
 }
 
